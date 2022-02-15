@@ -62,7 +62,7 @@ begin
 	if(rising_edge(clk))then
 		if(ena='1') then
 			if(counter < toUnsigned(c_cycles,counter'length))then
-				counter++;
+				counter<=counter+1;
 			else
 				time_elapsed<='1';
 			end if;
@@ -93,29 +93,42 @@ begin
 					
 					if(sig_in='1') then
 						next_state<=s1;
-						
+						counter
 					elsif(rst_n='0') then
 						next_state<=s0;
-						
+					end if;
 			when s1 => --btn_prs
 				debounced<='0';
 				
 				if(ena='0') then
 					next_state<=s0;
 					
-				elsif(time_elapsed<c_counter_width) then
+				elsif(time_elapsed<='0') then
 					next_state<=s1;
-					time_elapsed=time_elapsed+1;
-				
-				elsif(time_elapsed and sig_in='0')then
-					next_state<=
-				next_state<=s2;
+					counter<=counter+1;
+				elsif(time_elapsed<='1' and sig_in<='0')then
+					next_state<=s0;
+				elsif(time_elapsed<='1' and sig_in<='1') then
+					next_state<=s2;
+				end if;
 			when s2 => --valid
 				debounced<='1';
-				next_state<=s3;
+				if(ena<='0')then 
+					next_state<=s0;
+				elsif(sig_in<='0')then
+					next_state<=s3;
+				end if;
 			when s3 => --btn_unprs
-				debounced<='1';
-				next_state<=s2;
+				debounced<='0';
+				if(time_elapsed<='0')
+					counter<=counter+1;
+					next_state<=s3;
+				elsif(ena='0' or time_elapsed<='0')
+					next_state<=s0;
+				end if;			
+			when others=>
+				next_state<=s0;debounced<='0';
+		end case;
 			
     -- -----------------------------------------------------------------------------
 	-- Completar el bloque combinacional de la FSM usar case when
