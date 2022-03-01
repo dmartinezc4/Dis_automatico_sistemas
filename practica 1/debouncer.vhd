@@ -48,7 +48,7 @@ architecture Behavioural of debouncer is
     -- -----------------------------------------------------------------------------
     type state_type is (s0,s1,s2,s3);--estados
 	signal current_state,next_state: state_type;--registros de estados
-	signal counter: unsigned(c_counter_width-1 downto 0)-- contador
+	signal counter: unsigned(c_counter_width-1 downto 0);-- contador
 	signal time_elapsed: std_logic;--ha pasado el tiempo
     -- -----------------------------------------------------------------------------
     
@@ -61,13 +61,13 @@ begin
 	-- Completar el timer que genera la señal de time_elapsed para trancionar en las máquinas de estados
 	if(rising_edge(clk))then
 		if(ena='1') then
-			if(counter < toUnsigned(c_cycles,counter'length))then
+			if(counter < TO_UNSIGNED(c_cycles,counter'length))then
 				counter<=counter+1;
 			else
 				time_elapsed<='1';
 			end if;
 		elsif(ena='0')then
-			counter<='0';
+			counter<=(others=>'0');
 		end if;
 	end if;
 	
@@ -78,22 +78,23 @@ begin
     process (clk, rst_n)
     begin
   
-	if(rising_edge(clk) then
+	if(rising_edge(clk)) then
 		if(rst_n ='0') then
 			current_state<=s0;
 		else
 			current_state<=next_state;
+        end if;
+    end if; 
     end process;
 	
-    process (state_type,sig_in,rst_n,clk,ena)--sensitivity list)
+    process (current_state,next_state,sig_in,rst_n,clk,ena)--sensitivity list)
     begin
 		case current_state is
 			when s0 => --idle
 					debounced<='0';
-					
 					if(sig_in='1') then
 						next_state<=s1;
-						counter
+						counter<=counter;
 					elsif(rst_n='0') then
 						next_state<=s0;
 					end if;
@@ -120,10 +121,10 @@ begin
 				end if;
 			when s3 => --btn_unprs
 				debounced<='0';
-				if(time_elapsed<='0')
+				if(time_elapsed<='0')then
 					counter<=counter+1;
 					next_state<=s3;
-				elsif(ena='0' or time_elapsed<='0')
+				elsif(ena='0' or time_elapsed<='0') then
 					next_state<=s0;
 				end if;			
 			when others=>
