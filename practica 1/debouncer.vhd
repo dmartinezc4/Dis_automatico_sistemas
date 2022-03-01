@@ -58,17 +58,18 @@ begin
     process (clk, rst_n)
     begin
     -- -----------------------------------------------------------------------------
-	-- Completar el timer que genera la señal de time_elapsed para trancionar en las máquinas de estados
-	if(rising_edge(clk))then
-		if(ena='1') then
-			if(counter < TO_UNSIGNED(c_cycles,counter'length))then
+	-- Completar el timer que genera la se�al de time_elapsed para trancionar en las maquinas de estados
+	if(rst_n='0') then
+	    time_elapsed<='0';
+        counter<=(others=>'0');	
+	
+	elsif(rising_edge(clk))then			
+			if(counter < to_unsigned(c_cycles,counter'length))then
 				counter<=counter+1;
 			else
 				time_elapsed<='1';
 			end if;
-		elsif(ena='0')then
-			counter<=(others=>'0');
-		end if;
+			
 	end if;
 	
 	-- -----------------------------------------------------------------------------
@@ -78,12 +79,10 @@ begin
     process (clk, rst_n)
     begin
   
-	if(rising_edge(clk)) then
-		if(rst_n ='0') then
-			current_state<=s0;
-		else
+    if(rst_n ='0') then
+        current_state<=s0;
+	elsif(rising_edge(clk)) then
 			current_state<=next_state;
-        end if;
     end if; 
     end process;
 	
@@ -94,7 +93,6 @@ begin
 					debounced<='0';
 					if(sig_in='1') then
 						next_state<=s1;
-						counter<=counter;
 					elsif(rst_n='0') then
 						next_state<=s0;
 					end if;
@@ -106,7 +104,7 @@ begin
 					
 				elsif(time_elapsed<='0') then
 					next_state<=s1;
-					counter<=counter+1;
+					
 				elsif(time_elapsed<='1' and sig_in<='0')then
 					next_state<=s0;
 				elsif(time_elapsed<='1' and sig_in<='1') then
@@ -122,18 +120,13 @@ begin
 			when s3 => --btn_unprs
 				debounced<='0';
 				if(time_elapsed<='0')then
-					counter<=counter+1;
+					
 					next_state<=s3;
 				elsif(ena='0' or time_elapsed<='0') then
 					next_state<=s0;
 				end if;			
 			when others=>
 				next_state<=s0;debounced<='0';
-		end case;
-			
-    -- -----------------------------------------------------------------------------
-	-- Completar el bloque combinacional de la FSM usar case when
-	-- -----------------------------------------------------------------------------
-      
+		end case;		      
     end process;
 end Behavioural;
