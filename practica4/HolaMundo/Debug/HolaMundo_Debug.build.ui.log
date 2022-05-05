@@ -1,0 +1,26 @@
+2022-04-30T09:23:44.630165600255-09:23:44 **** Build of configuration Debug for project HolaMundo ****
+000-make all 
+000-'Building file: ../src/helloworld.c'
+000-'Invoking: MicroBlaze gcc compiler'
+000-mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/helloworld.o" -IC:/Users/david/Desktop/Nebrija/vitis-eclipse/practica_4/export/practica_4/sw/practica_4/standalone_domain/bspinclude/include -mlittle-endian -mcpu=v11.0 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/helloworld.d" -MT"src/helloworld.o" -o "src/helloworld.o" "../src/helloworld.c"
+000-'Finished building: ../src/helloworld.c'
+000-' '
+000-'Building file: ../src/platform.c'
+000-'Invoking: MicroBlaze gcc compiler'
+000-mb-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/platform.o" -IC:/Users/david/Desktop/Nebrija/vitis-eclipse/practica_4/export/practica_4/sw/practica_4/standalone_domain/bspinclude/include -mlittle-endian -mcpu=v11.0 -mxl-soft-mul -Wl,--no-relax -ffunction-sections -fdata-sections -MMD -MP -MF"src/platform.d" -MT"src/platform.o" -o "src/platform.o" "../src/platform.c"
+000-'Finished building: ../src/platform.c'
+000-' '
+000-'Building target: HolaMundo.elf'
+000-'Invoking: MicroBlaze gcc linker'
+000-mb-gcc -Wl,-T -Wl,../src/lscript.ld -LC:/Users/david/Desktop/Nebrija/vitis-eclipse/practica_4/export/practica_4/sw/practica_4/standalone_domain/bsplib/lib -mlittle-endian -mcpu=v11.0 -mxl-soft-mul -Wl,--no-relax -Wl,--gc-sections -o "HolaMundo.elf"  ./src/helloworld.o ./src/platform.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+000-'Finished building target: HolaMundo.elf'
+000-' '
+000-'Invoking: MicroBlaze Print Size'
+000-mb-size HolaMundo.elf  |tee "HolaMundo.elf.size"
+000-   text	   data	    bss	    dec	    hex	filename
+000-   2448	    268	   3108	   5824	   16c0	HolaMundo.elf
+000-'Finished building: HolaMundo.elf.size'
+000-' '
+00255-
+09:23:50 Build Finished (took 5s.950ms)
+
