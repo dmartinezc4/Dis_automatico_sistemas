@@ -46,7 +46,7 @@ architecture Behavioural of debouncer is
     constant c_counter_width    : integer := integer(ceil(log2(real(c_cycles))));
     
     -- -----------------------------------------------------------------------------
-    type state_type is (s0,s1,s2,s3);--estados
+    type state_type is (idle,btn_prs,valid,btn_unprs);--estados
 	signal current_state,next_state: state_type;--registros de estados
 	signal counter: unsigned(c_counter_width-1 downto 0);-- contador
 	signal time_elapsed: std_logic;--ha pasado el tiempo
@@ -66,8 +66,10 @@ begin
 	elsif(rising_edge(clk))then			
 			if(counter < to_unsigned(c_cycles,counter'length))then
 				counter<=counter+1;
+				
 			else
 				time_elapsed<='1';
+				counter<=(others=>'0');
 			end if;
 			
 	end if;
@@ -80,53 +82,53 @@ begin
     begin
   
     if(rst_n ='0') then
-        current_state<=s0;
+        current_state<=idle;
 	elsif(rising_edge(clk)) then
 			current_state<=next_state;
     end if; 
     end process;
 	
-    process (current_state,next_state,sig_in,rst_n,clk,ena)--sensitivity list)
+    process (current_state,sig_in,rst_n,ena)--sensitivity list)
     begin
 		case current_state is
-			when s0 => --idle
+			when idle => --idle
 					debounced<='0';
 					if(sig_in='1') then
-						next_state<=s1;
+						next_state<=btn_prs;
 					elsif(rst_n='0') then
-						next_state<=s0;
+						next_state<=idle;
 					end if;
-			when s1 => --btn_prs
+			when btn_prs => --btn_prs
 				debounced<='0';
 				
 				if(ena='0') then
-					next_state<=s0;
+					next_state<=idle;
 					
 				elsif(time_elapsed<='0') then
-					next_state<=s1;
+					next_state<=btn_prs;
 					
 				elsif(time_elapsed<='1' and sig_in<='0')then
-					next_state<=s0;
+					next_state<=idle;
 				elsif(time_elapsed<='1' and sig_in<='1') then
-					next_state<=s2;
+					next_state<=valid;
 				end if;
-			when s2 => --valid
+			when valid => --valid
 				debounced<='1';
 				if(ena<='0')then 
-					next_state<=s0;
+					next_state<=idle;
 				elsif(sig_in<='0')then
-					next_state<=s3;
+					next_state<=btn_unprs;
 				end if;
-			when s3 => --btn_unprs
+			when btn_unprs => --btn_unprs
 				debounced<='0';
 				if(time_elapsed<='0')then
 					
-					next_state<=s3;
+					next_state<=btn_unprs;
 				elsif(ena='0' or time_elapsed<='0') then
-					next_state<=s0;
+					next_state<=idle;
 				end if;			
 			when others=>
-				next_state<=s0;debounced<='0';
+				next_state<=idle;debounced<='0';
 		end case;		      
     end process;
 end Behavioural;

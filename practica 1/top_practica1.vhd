@@ -101,7 +101,7 @@ begin
     if (rst_n = '0') then --Cuando el reset es 0 el estado ha de ser 0
       LED_register<='0';
 	  
-    elsif rising_edge(clk100Mhz) then --en caso de no ser cero y haber flanco de subida, el registro de led serÃ¡ el toggle 
+    elsif rising_edge(clk100Mhz) then --en caso de no ser cero y haber flanco de subida, el registro de led será el toggle 
       LED_register<=state_LED;
 
     end if;
@@ -116,4 +116,3 @@ begin
   -- Connect LED_register to the output
   LED <= LED_register;
 end behavioural;
-  
