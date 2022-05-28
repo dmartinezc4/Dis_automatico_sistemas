@@ -66,7 +66,7 @@ begin
 	elsif(rising_edge(clk))then			
 			if(counter < to_unsigned(c_cycles,counter'length))then
 				counter<=counter+1;
-				
+				time_elapsed<='0';
 			else
 				time_elapsed<='1';
 				counter<=(others=>'0');
@@ -88,7 +88,7 @@ begin
     end if; 
     end process;
 	
-    process (current_state,sig_in,rst_n,ena)--sensitivity list)
+    process (current_state,sig_in,rst_n,ena,clk)--sensitivity list)
     begin
 		case current_state is
 			when idle => --idle
