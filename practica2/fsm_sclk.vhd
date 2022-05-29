@@ -25,6 +25,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use IEEE.MATH_REAL.ALL;
 
 entity fsm_sclk is
 	generic(
@@ -44,10 +45,79 @@ end fsm_sclk;
 
 architecture behavioural of fsm_sclk is
 
-	-- TenÃ©is que hacer la conversion necesaria para sacar la constante que indique
-	--	el nÃºmero de ciclos para medio periodo del SCLK. DebÃ©is usar floor 
+	-- Tenéis que hacer la conversion necesaria para sacar la constante que indique
+	--	el número de ciclos para medio periodo del SCLK. Debéis usar floor 
 	-- para el redondeo (que opera con reales)
-	constant c_half_T_SCLK : integer := integer(); --constant value to compare and generate the rising/falling edge 
-	constant c_counter_width : integer := integer(); -- the width of the counter, take as reference the debouncer
-	begin
-	end
+	
+	--1 Hz = 1 ciclo
+	-- f=(1/periodo)   periodo=(1/f)
+	
+	constant c_cycles : integer :=integer((1/g_freq_SCLK_KHZ)*g_system_clock); --Los ciclos serían el tiempo de este módulo * la frequencia del sistema total
+	
+	
+	constant c_half_T_SCLK : integer := integer((1/g_freq_SCLK_KHZ)*g_system_clock); --constant value to compare and generate the rising/falling edge 
+	constant c_counter_width :integer :=integer(floor(log2(real(c_cycles)))); -- the width of the counter, take as reference the debouncer
+	
+	type state_type is (sclk0,sclk1);                        --Estados  (respectivamente sclk=0 y sclk=1)
+	signal current_state,next_state: state_type;       --Cambiar estados
+	signal CNT: unsigned(c_counter_width-1 downto 0);  --Contador
+	signal time_elapsed: std_logic;                    --Ha pasado el tiempo
+	
+	begin	
+	
+	
+	process (clk,rst_n) begin --process contador
+	   if(rst_n='0') then
+	    CNT<=(others=>'0');
+	    time_elapsed<='0';
+	   elsif(rising_edge(clk))then
+	       if(CNT<to_unsigned(c_half_T_SCLK,CNT'length))then
+	           CNT<=CNT+1;
+	       else
+	           time_elapsed<='1';
+	           CNT<=(others=>'0');
+	       end if;
+	    end if;
+	    	
+	end process;
+	
+	process (clk,rst_n) begin --Registro de siguiente estado
+	if(rst_n='0')then
+	   current_state<=sclk0;
+    else
+        current_state<=next_state;
+	end if;
+	
+	end process;
+	
+	process (current_state)begin
+	   case current_state is
+	   
+	   when sclk0=>
+	       if(time_elapsed<='0')then
+	           next_state<=sclk0;
+	           sclk_fall<='0';
+	       elsif(time_elapsed<='1')then
+               next_state<=sclk1;
+               sclk_rise<='1';
+	       end if;
+	   when sclk1=>
+	       if(time_elapsed<='0')then
+	           next_state<=sclk1;
+	           sclk_rise<='0';
+	       elsif(time_elapsed<='1')then
+               next_state<=sclk0;
+               sclk_fall<='1';
+	       end if;
+	   
+	   when others=>
+           next_state<=sclk0;
+           sclk_fall<='0';
+           sclk_rise<='0';
+	   end case;
+	   --Yo entiendo que pese a que no lo ponga en el pdf cuando hay un fall el rise tiene que acabar y viceversa
+	   --Si no estarían ambas a 1 de manera constante rise y fall de sclk
+	end process;
+	
+	
+	end behavioural;
