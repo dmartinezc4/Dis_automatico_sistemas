@@ -1,26 +1,3 @@
---------------------------------------------------------------------------------
---
--- Title       : 	FIR filter
--- Design      :	
--- Author      :	Pablo Sarabia Ortiz
--- Company     :	Universidad de Nebrija
---------------------------------------------------------------------------------
--- File        : fir.vhd
--- Generated   : 03 May 2022
---------------------------------------------------------------------------------
--- Description : Problema 2.4 Arbitro prioridad dinamica
--- Enunciado   :
--- FIR 8 bit filter with four stages
---------------------------------------------------------------------------------
--- Revision History :
--- -----------------------------------------------------------------------------
-
---   Ver  :| Author            :| Mod. Date :|    Changes Made:
-
---   v1.0  | Pablo Sarabia     :| 03/05/22  :| First version
-
--- -----------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
